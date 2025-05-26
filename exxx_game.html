@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมเลือก - เริ่มใหม่หรือไม่ต้อง</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.5s ease;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .character {
+            font-size: 1000%;
+            margin: 30px 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+            display: inline-block;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin: 30px 0;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .choice-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+            transform: scale(1);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(86, 171, 47, 0.4);
+        }
+
+        .no-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            transform: scale(1);
+        }
+
+        .no-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .angry-mode {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+        }
+
+        .very-angry-mode {
+            background: linear-gradient(135deg, #ff3742 0%, #c44569 100%);
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .counter {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .final-message {
+            font-size: 2rem;
+            color: #ffffff;
+            margin: 20px 0;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 25px;
+            border-radius: 15px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            font-size: 30px;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .message { font-size: 1.2rem; }
+            .choice-btn { padding: 12px 30px; font-size: 1rem; }
+            .buttons-container { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <h1 class="title">💕 เกมเลือกทาง 💕</h1>
+        
+        <div class="character" id="character">😊</div>
+        
+        <div class="message" id="message">
+            อยากเริ่มต้นใหม่กับพี่มั้ย? 💖
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 100%"></div>
+        </div>
+
+        <div class="counter" id="counter">
+            ความสุข: 100% | คลิก "ไม่ต้อง": 0 ครั้ง
+        </div>
+
+        <div class="buttons-container">
+            <button class="choice-btn restart-btn" onclick="restart()">
+                ✨ เริ่มใหม่ ✨
+            </button>
+            <button class="choice-btn no-btn" onclick="sayNo()">
+                ❌ ไม่ต้อง ❌
+            </button>
+        </div>
+
+        <div id="finalMessage" class="final-message" style="display: none;"></div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        let currentSize = 1000;
+        let noClickCount = 0;
+        let happiness = 100;
+        
+        const character = document.getElementById('character');
+        const message = document.getElementById('message');
+        const gameContainer = document.getElementById('gameContainer');
+        const progressFill = document.getElementById('progressFill');
+        const counter = document.getElementById('counter');
+        const finalMessage = document.getElementById('finalMessage');
+        const body = document.body;
+
+        const characters = ['😊', '😐', '😕', '😠', '😡', '🤬', '💔', '👻', '💀', '🔥'];
+        const messages = [
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖',
+            'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖'
+        ];
+
+        const backgrounds = [
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a56 0%, #ffad56 100%)',
+            'linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%)',
+            'linear-gradient(135deg, #ff4757 0%, #ff3742 100%)',
+            'linear-gradient(135deg, #c44569 0%, #8b2635 100%)',
+            'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+            'linear-gradient(135deg, #1e1e2e 0%, #16213e 100%)',
+            'linear-gradient(135deg, #000000 0%, #434343 100%)',
+            'linear-gradient(135deg, #ff0000 0%, #000000 100%)'
+        ];
+
+        function sayNo() {
+            noClickCount++;
+            currentSize -= 100;
+            happiness -= 10;
+
+            if (currentSize <= 0) {
+                currentSize = 10;
+                happiness = 0;
+                showFinalMessage();
+                return;
+            }
+
+            // อัพเดทขนาดตัวอักษร
+            character.style.fontSize = currentSize + '%';
+            
+            // เปลี่ยนหน้าและข้อความ
+            const charIndex = Math.min(noClickCount - 1, characters.length - 1);
+            character.textContent = characters[charIndex];
+            // ไม่เปลี่ยนข้อความ - ให้เป็นเหมือนเดิม
+
+            // เปลี่ยนพื้นหลัง
+            body.style.background = backgrounds[Math.min(noClickCount - 1, backgrounds.length - 1)];
+
+            // อัพเดท progress bar
+            progressFill.style.width = Math.max(happiness, 0) + '%';
+            
+            // อัพเดทตัวนับ
+            counter.textContent = `ความสุข: ${Math.max(happiness, 0)}% | คลิก "ไม่ต้อง": ${noClickCount} ครั้ง`;
+
+            // ลดขนาดปุ่ม "ไม่ต้อง"
+            const noBtn = document.querySelector('.no-btn');
+            const newScale = Math.max(0.3, 1 - (noClickCount * 0.1));
+            noBtn.style.transform = `scale(${newScale})`;
+
+            // เอฟเฟกต์พิเศษเมื่อโกรธมาก
+            if (noClickCount >= 5) {
+                gameContainer.classList.add('very-angry-mode');
+            } else if (noClickCount >= 3) {
+                gameContainer.classList.add('angry-mode');
+            }
+
+            // เอฟเฟกต์สั่น
+            character.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                character.style.animation = '';
+            }, 500);
+        }
+
+        function restart() {
+            // รีเซ็ทค่าทั้งหมด
+            currentSize = 1000;
+            noClickCount = 0;
+            happiness = 100;
+
+            character.style.fontSize = currentSize + '%';
+            character.textContent = '😊';
+            message.textContent = '💌 ทักไอจี ทักอะไรก็ได้ทักมาได้หมดเลย ไม่ต้องกลัวอึดอัด 💌';
+            
+            body.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)';
+            
+            gameContainer.classList.remove('angry-mode', 'very-angry-mode');
+            
+            progressFill.style.width = '100%';
+            counter.textContent = 'ความสุข: 100% | คลิก "ไม่ต้อง": 0 ครั้ง';
+            
+            finalMessage.style.display = 'none';
+            character.style.opacity = '1';
+
+            // รีเซ็ทขนาดปุ่ม "ไม่ต้อง"
+            const noBtn = document.querySelector('.no-btn');
+            noBtn.style.transform = 'scale(1)';
+
+            // เอฟเฟกต์การฉลอง
+            createCelebration();
+            
+            // เปลี่ยนกลับเป็นข้อความเดิมหลัง 3 วินาที
+            setTimeout(() => {
+                message.textContent = 'อยากเริ่มต้นใหม่กับพี่มั้ย? 💖';
+            }, 3000);
+        }
+
+        function showFinalMessage() {
+            finalMessage.textContent = '😭 หายไปแล้ว... กดเริ่มใหม่ถ้าอยากเจอกันอีก 😭';
+            finalMessage.style.display = 'block';
+            
+            // ซ่อนตัวละคร
+            character.style.opacity = '0.1';
+            message.textContent = '...';
+        }
+
+        function createCelebration() {
+            const celebration = document.getElementById('celebration');
+            const emojis = ['🎉', '🎊', '💖', '✨', '🌟', '💕', '🎈', '🥳'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    celebration.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 100);
+            }
+        }
+
+        // เอฟเฟกต์เมื่อโหลดหน้า
+        window.addEventListener('load', () => {
+            character.style.transform = 'scale(0)';
+            setTimeout(() => {
+                character.style.transform = 'scale(1)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
